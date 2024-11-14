@@ -18,141 +18,137 @@ type Data = {
   error?: string;
 };
 
+const respondError = (
+  res: NextApiResponse<Data>,
+  status: number,
+  message: string
+) => {
+  return res.status(status).json({ success: false, error: message });
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  switch (req.method) {
-    // CREATE: Add a new user
-    case "POST":
-      const { name, username, email, role, password } = req.body;
+  const { method, body, query } = req;
 
-      if (!name || !username || !email || !password) {
-        return res
-          .status(400)
-          .json({ success: false, error: "Missing required fields" });
-      }
+  if (method === "POST") {
+    const { name, username, email, role, password } = body;
 
-      // Hash the password
+    if (!name || !username || !email || !password) {
+      return respondError(res, 400, "Missing required fields");
+    }
+
+    try {
       const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Insert the new user into the 'users' table
       const { data, error } = await supabase
         .from("users")
         .insert([{ name, username, email, role, password: hashedPassword }])
+        .select("id, name, username, email, role, created_at, updated_at")
         .single();
 
-      if (error) {
-        return res.status(500).json({ success: false, error: error.message });
-      }
-
+      if (error) throw error;
       return res.status(201).json({ success: true, data });
+    } catch (error) {
+      return respondError(
+        res,
+        500,
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+  }
 
-    // READ: Fetch a specific user by id or fetch all users if no id is provided
-    case "GET":
-      const userId = req.query.id as string | undefined;
+  if (method === "GET") {
+    const userId = query.id as string | undefined;
 
+    try {
       if (userId) {
-        // Fetch a single user by id
-        const { data: userData, error: getError } = await supabase
+        const { data: userData, error } = await supabase
           .from("users")
-          .select("*")
-          .limit(10)
+          .select("id, name, username, email, role, created_at, updated_at")
           .eq("id", userId)
           .single();
 
-        if (getError) {
-          return res
-            .status(500)
-            .json({ success: false, error: getError.message });
-        }
-
+        if (error) throw error;
         return res.status(200).json({ success: true, data: userData });
       } else {
-        // Fetch all users
-        const { data: usersData, error: getAllError } = await supabase
+        const { data: usersData, error } = await supabase
           .from("users")
-          .select("*");
+          .select("id, name, username, email, role, created_at, updated_at");
 
-        if (getAllError) {
-          return res
-            .status(500)
-            .json({ success: false, error: getAllError.message });
-        }
-
+        if (error) throw error;
         return res.status(200).json({ success: true, data: usersData });
       }
+    } catch (error) {
+      return respondError(
+        res,
+        500,
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+  }
 
-    // UPDATE: Update user data by id
-    case "PUT":
-      const updateId = req.query.id as string;
-      const {
-        name: updatedName,
-        username: updatedUsername,
-        email: updatedEmail,
-        role: updatedRole,
-        password: updatedPassword,
-      } = req.body;
+  if (method === "PUT") {
+    const updateId = query.id as string;
+    const { name, username, email, role, password } = body;
 
-      if (!updateId) {
-        return res
-          .status(400)
-          .json({ success: false, error: "User ID is required" });
-      }
+    if (!updateId) {
+      return respondError(res, 400, "User ID is required");
+    }
 
-      // Hash the updated password if provided
-      const updatedDataFields: Partial<User & { password: string }> = {
-        name: updatedName,
-        username: updatedUsername,
-        email: updatedEmail,
-        role: updatedRole,
+    try {
+      const updatedData: Partial<User & { password: string }> = {
+        name,
+        username,
+        email,
+        role,
       };
 
-      if (updatedPassword) {
-        updatedDataFields.password = await bcrypt.hash(updatedPassword, 10);
+      if (password) {
+        updatedData.password = await bcrypt.hash(password, 10);
       }
 
-      // Update the user data
-      const { data: updatedData, error: updateError } = await supabase
+      const { data: updatedDataResult, error } = await supabase
         .from("users")
-        .update(updatedDataFields)
+        .update(updatedData)
         .eq("id", updateId)
+        .select("id, name, username, email, role, created_at, updated_at")
         .single();
 
-      if (updateError) {
-        return res
-          .status(500)
-          .json({ success: false, error: updateError.message });
-      }
+      if (error) throw error;
+      return res.status(200).json({ success: true, data: updatedDataResult });
+    } catch (error) {
+      return respondError(
+        res,
+        500,
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+  }
 
-      return res.status(200).json({ success: true, data: updatedData });
+  if (method === "DELETE") {
+    const deleteId = query.id as string;
 
-    // DELETE: Delete a user by id
-    case "DELETE":
-      const deleteId = req.query.id as string;
+    if (!deleteId) {
+      return respondError(res, 400, "User ID is required");
+    }
 
-      if (!deleteId) {
-        return res
-          .status(400)
-          .json({ success: false, error: "User ID is required" });
-      }
-
-      const { error: deleteError } = await supabase
+    try {
+      const { error } = await supabase
         .from("users")
         .delete()
         .eq("id", deleteId);
 
-      if (deleteError) {
-        return res
-          .status(500)
-          .json({ success: false, error: deleteError.message });
-      }
-
+      if (error) throw error;
       return res.status(200).json({ success: true, data: null });
-
-    default:
-      return res
-        .status(405)
-        .json({ success: false, error: "Method Not Allowed" });
+    } catch (error) {
+      return respondError(
+        res,
+        500,
+        error instanceof Error ? error.message : String(error)
+      );
+    }
   }
+
+  return respondError(res, 405, "Method Not Allowed");
 }
