@@ -4,7 +4,8 @@ import bcrypt from "bcrypt";
 
 type User = {
   id: number;
-  name: string;
+  first_name: string;
+  last_name: string;
   username: string;
   email: string;
   role: string;
@@ -33,9 +34,9 @@ export default async function handler(
   const { method, body, query } = req;
 
   if (method === "POST") {
-    const { name, username, email, role, password } = body;
+    const { first_name, last_name, username, email, role, password } = body;
 
-    if (!name || !username || !email || !password) {
+    if (!first_name || !last_name || !username || !email || !password) {
       return respondError(res, 400, "Missing required fields");
     }
 
@@ -43,8 +44,19 @@ export default async function handler(
       const hashedPassword = await bcrypt.hash(password, 10);
       const { data, error } = await supabase
         .from("users")
-        .insert([{ name, username, email, role, password: hashedPassword }])
-        .select("id, name, username, email, role, created_at, updated_at")
+        .insert([
+          {
+            first_name,
+            last_name,
+            username,
+            email,
+            role,
+            password: hashedPassword,
+          },
+        ])
+        .select(
+          "id, first_name, last_name, username, email, role, created_at, updated_at"
+        )
         .single();
 
       if (error) throw error;
@@ -65,7 +77,9 @@ export default async function handler(
       if (userId) {
         const { data: userData, error } = await supabase
           .from("users")
-          .select("id, name, username, email, role, created_at, updated_at")
+          .select(
+            "id, first_name,last_name, username, email, role, created_at, updated_at"
+          )
           .eq("id", userId)
           .single();
 
@@ -74,7 +88,9 @@ export default async function handler(
       } else {
         const { data: usersData, error } = await supabase
           .from("users")
-          .select("id, name, username, email, role, created_at, updated_at");
+          .select(
+            "id, first_name, last_name, username, email, role, created_at, updated_at"
+          );
 
         if (error) throw error;
         return res.status(200).json({ success: true, data: usersData });
@@ -88,22 +104,22 @@ export default async function handler(
     }
   }
 
-  if (method === "PUT") {
+  if (method === "PATCH") {
     const updateId = query.id as string;
-    const { name, username, email, role, password } = body;
+    const { first_name, last_name, username, email, role, password } = body;
 
     if (!updateId) {
       return respondError(res, 400, "User ID is required");
     }
 
     try {
-      const updatedData: Partial<User & { password: string }> = {
-        name,
-        username,
-        email,
-        role,
-      };
+      const updatedData: Partial<User & { password: string }> = {};
 
+      if (first_name) updatedData.first_name = first_name;
+      if (last_name) updatedData.last_name = last_name;
+      if (username) updatedData.username = username;
+      if (email) updatedData.email = email;
+      if (role) updatedData.role = role;
       if (password) {
         updatedData.password = await bcrypt.hash(password, 10);
       }
@@ -112,7 +128,9 @@ export default async function handler(
         .from("users")
         .update(updatedData)
         .eq("id", updateId)
-        .select("id, name, username, email, role, created_at, updated_at")
+        .select(
+          "id, first_name, last_name, username, email, role, created_at, updated_at"
+        )
         .single();
 
       if (error) throw error;
