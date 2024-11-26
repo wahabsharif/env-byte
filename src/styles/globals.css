@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* src/styles/globals.css or a similar file */
 @font-face {
   font-family: "MyCustomFont";
   src: url("/fonts/MADENZ.ttf") format("truetype");

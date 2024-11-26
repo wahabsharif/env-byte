@@ -9,7 +9,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        custom: ["MyCustomFont", "sans-serif"],
+        madenz: ["MyCustomFont", "sans-serif"],
       },
     },
     colors: {
