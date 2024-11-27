@@ -1,5 +1,4 @@
-import WebLayout, { generateMetadata } from "@/components/layouts/WebLayout";
-
+import WebLayout, { generateMetadata } from "@/layouts/WebLayout";
 
 export const metadata = generateMetadata({ pageTitle: "" });
 
