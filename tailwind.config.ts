@@ -13,6 +13,8 @@ export default {
       },
     },
     colors: {
+      white: "#f8fafc",
+      black: "#020617",
       thGreen: "#083831",
       thLightGreen: "#14b8a6",
       lightBg: "#e3fffb",

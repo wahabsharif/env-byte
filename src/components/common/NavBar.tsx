@@ -12,7 +12,7 @@ const NavBar: React.FC = () => {
   const [submenuOpenIndex, setSubmenuOpenIndex] = useState<number | null>(null);
 
   return (
-    <nav className="bg-gray-900 dark:bg-gray-800/70 backdrop-blur-md fixed top-8 left-1/2 transform -translate-x-1/2 w-[95%] z-50 rounded-xl shadow-lg hidden md:block transition ease-in-out">
+    <nav className="bg-gray-800/70 text-white backdrop-blur-md fixed top-8 left-1/2 transform -translate-x-1/2 w-[95%] z-50 rounded-xl shadow-lg hidden md:block transition ease-in-out">
       <div className="container mx-auto flex items-center justify-between p-4">
         {/* Left Side: Logo and Menu */}
         <div className="flex items-center space-x-6">
@@ -35,7 +35,7 @@ const NavBar: React.FC = () => {
                 return (
                   <motion.li
                     key={menuItem.label}
-                    className="relative group text-black dark:text-white"
+                    className="relative group"
                     onMouseEnter={() =>
                       menuItem.submenu && setSubmenuOpenIndex(index)
                     }
@@ -82,7 +82,7 @@ const NavBar: React.FC = () => {
                                 scale: 1.1,
                               }}
                               transition={{ type: "spring", stiffness: 200 }}
-                              className="bg-gray-900 dark:bg-gray-800 backdrop-blur-md rounded-xl shadow-lg "
+                              className="bg-gray-700 backdrop-blur-md rounded-xl shadow-lg "
                             >
                               <Link
                                 href={submenuItem.href}
