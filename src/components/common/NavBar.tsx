@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { TiArrowSortedUp } from "react-icons/ti";
 import dynamic from "next/dynamic";
 
-
 const NavBar: React.FC = () => {
   const [submenuOpenIndex, setSubmenuOpenIndex] = useState<number | null>(null);
 
@@ -133,5 +132,4 @@ const NavBar: React.FC = () => {
   );
 };
 
-export default dynamic (() => Promise.resolve(NavBar), {ssr: false})
-
+export default dynamic(() => Promise.resolve(NavBar), { ssr: false });
