@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/lib/supabaseClient";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken"; // Add JWT library for token generation
 
 type User = {
   id: number;
@@ -17,8 +18,10 @@ type Data = {
   success: boolean;
   data?: User | User[] | null;
   error?: string;
+  token?: string;  // Added token for login response
 };
 
+// Error response function
 const respondError = (
   res: NextApiResponse<Data>,
   status: number,
@@ -27,13 +30,17 @@ const respondError = (
   return res.status(status).json({ success: false, error: message });
 };
 
+// JWT Secret - Keep this in your environment variables
+const JWT_SECRET = process.env.JWT_SECRET || "ABCDE";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
   const { method, body, query } = req;
 
-  if (method === "POST") {
+  // Add New User (POST)
+  if (method === "POST" && body.password) {
     const { first_name, last_name, username, email, role, password } = body;
 
     if (!first_name || !last_name || !username || !email || !password) {
@@ -61,6 +68,50 @@ export default async function handler(
 
       if (error) throw error;
       return res.status(201).json({ success: true, data });
+    } catch (error) {
+      return respondError(
+        res,
+        500,
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+  }
+
+  //  Login User (POST)
+  if (method === "POST" && body.username && body.password) {
+    const { username, password } = body;
+
+    if (!username || !password) {
+      return respondError(res, 400, "Username and Password are required");
+    }
+
+    try {
+      // Fetch the user from the database using the username
+      const { data: userData, error } = await supabase
+        .from("users")
+        .select("id, first_name, last_name, username, email, role, password")
+        .eq("username", username)
+        .single();
+
+      if (error || !userData) {
+        return respondError(res, 401, "Invalid username or password");
+      }
+
+      // Compare the entered password with the hashed password in the database
+      const isPasswordValid = await bcrypt.compare(password, userData.password);
+      if (!isPasswordValid) {
+        return respondError(res, 401, "Invalid username or password");
+      }
+
+      // Generate a JWT token for the user
+      const token = jwt.sign(
+        { id: userData.id, username: userData.username, role: userData.role },
+        JWT_SECRET, // Secret key for signing the token
+        { expiresIn: "1d" } // Token expiry (1 day)
+      );
+
+      // Return the token to the client
+      return res.status(200).json({ success: true, token });
     } catch (error) {
       return respondError(
         res,

@@ -6,12 +6,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { TiArrowSortedUp } from "react-icons/ti";
+import dynamic from "next/dynamic";
+
 
 const NavBar: React.FC = () => {
   const [submenuOpenIndex, setSubmenuOpenIndex] = useState<number | null>(null);
 
   return (
-    <nav className="bg-gray-100 dark:bg-gray-800/70 backdrop-blur-md fixed top-8 left-1/2 transform -translate-x-1/2 w-[95%] z-50 rounded-xl shadow-lg hidden md:block transition ease-in-out">
+    <nav className="bg-gray-900 dark:bg-gray-800/70 backdrop-blur-md fixed top-8 left-1/2 transform -translate-x-1/2 w-[95%] z-50 rounded-xl shadow-lg hidden md:block transition ease-in-out">
       <div className="container mx-auto flex items-center justify-between p-4">
         {/* Left Side: Logo and Menu */}
         <div className="flex items-center space-x-6">
@@ -81,7 +83,7 @@ const NavBar: React.FC = () => {
                                 scale: 1.1,
                               }}
                               transition={{ type: "spring", stiffness: 200 }}
-                              className="bg-gray-100 dark:bg-gray-800 backdrop-blur-md rounded-xl shadow-lg "
+                              className="bg-gray-900 dark:bg-gray-800 backdrop-blur-md rounded-xl shadow-lg "
                             >
                               <Link
                                 href={submenuItem.href}
@@ -119,7 +121,7 @@ const NavBar: React.FC = () => {
             transition={{ type: "spring", stiffness: 200 }}
           >
             <Link
-              href={"#"}
+              href={"/login"}
               className="p-2 uppercase border-2 font-madenz border-thLightGreen rounded-tr-lg rounded-br-2xl"
             >
               Login
@@ -131,4 +133,5 @@ const NavBar: React.FC = () => {
   );
 };
 
-export default NavBar;
+export default dynamic (() => Promise.resolve(NavBar), {ssr: false})
+
