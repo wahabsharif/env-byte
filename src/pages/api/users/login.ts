@@ -6,11 +6,16 @@ import jwt from "jsonwebtoken";
 type Data = {
   success: boolean;
   token?: string;
+  user?: {
+    first_name: string;
+    last_name: string;
+    role: string;
+  };
   error?: string;
 };
 
 // JWT Secret - Keep this in your environment variables
-const JWT_SECRET = process.env.JWT_SECRET || "ABCDE";
+const JWT_SECRET = process.env.JWT_SECRET || "";
 
 // Error response function
 const respondError = (
@@ -27,7 +32,6 @@ export default async function handler(
 ) {
   const { method, body } = req;
 
-  // Handle only POST requests
   if (method === "POST") {
     const { username, password } = body;
 
@@ -36,10 +40,9 @@ export default async function handler(
     }
 
     try {
-      // Fetch the user from the database using the username
       const { data: userData, error } = await supabase
         .from("users")
-        .select("id, username, role, password")
+        .select("id, username, first_name, last_name, role, password")
         .eq("username", username)
         .single();
 
@@ -47,21 +50,26 @@ export default async function handler(
         return respondError(res, 401, "Invalid username or password");
       }
 
-      // Compare the entered password with the hashed password in the database
       const isPasswordValid = await bcrypt.compare(password, userData.password);
       if (!isPasswordValid) {
         return respondError(res, 401, "Invalid username or password");
       }
 
-      // Generate a JWT token for the user
       const token = jwt.sign(
         { id: userData.id, username: userData.username, role: userData.role },
         JWT_SECRET,
-        { expiresIn: "1d" } // Token expiry (1 day)
+        { expiresIn: "1h" }
       );
 
-      // Return the token to the client
-      return res.status(200).json({ success: true, token });
+      return res.status(200).json({
+        success: true,
+        token,
+        user: {
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          role: userData.role,
+        },
+      });
     } catch (error) {
       return respondError(
         res,

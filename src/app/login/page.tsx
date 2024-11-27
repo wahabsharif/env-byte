@@ -23,10 +23,11 @@ export default function Login() {
       });
 
       if (response.data.success) {
-        const { token } = response.data;
+        const { token, user } = response.data;
 
         dispatch(
           setCredentials({
+            ...user, // Spread first_name, last_name, and role
             token,
           })
         );
