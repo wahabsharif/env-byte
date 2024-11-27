@@ -19,6 +19,7 @@ type Data = {
   error?: string;
 };
 
+// Error response function
 const respondError = (
   res: NextApiResponse<Data>,
   status: number,
@@ -33,6 +34,7 @@ export default async function handler(
 ) {
   const { method, body, query } = req;
 
+  // Add New User (POST)
   if (method === "POST") {
     const { first_name, last_name, username, email, role, password } = body;
 
@@ -70,6 +72,7 @@ export default async function handler(
     }
   }
 
+  // Get User(s) (GET)
   if (method === "GET") {
     const userId = query.id as string | undefined;
 
@@ -104,6 +107,7 @@ export default async function handler(
     }
   }
 
+  // Update User (PATCH)
   if (method === "PATCH") {
     const updateId = query.id as string;
     const { first_name, last_name, username, email, role, password } = body;
@@ -144,6 +148,7 @@ export default async function handler(
     }
   }
 
+  // Delete User (DELETE)
   if (method === "DELETE") {
     const deleteId = query.id as string;
 
