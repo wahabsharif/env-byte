@@ -33,7 +33,7 @@ export default function Login() {
         );
 
         // Redirect to the admin page after login
-        router.push("/dash");
+        router.push("/dashboard");
       }
     } catch (err) {
       console.error(err);

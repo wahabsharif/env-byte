@@ -6,16 +6,16 @@ export const sideBarData = [
   {
     title: "Dashboard",
     icon: AiFillHome,
-    path: "/dash",
+    path: "/dashboard",
   },
   {
     title: "Clients",
     icon: FaUsers,
-    path: "/clients",
+    path: "/dashboard/clients",
   },
   {
     title: "Projects",
     icon: FaFileShield,
-    path: "/projects",
+    path: "/dashboard/projects",
   },
 ];
