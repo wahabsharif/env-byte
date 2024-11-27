@@ -1,6 +1,6 @@
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import type { Metadata } from "next";
-import Link from "next/link";
+import SideBar from "@/components/common/SideBar";
 import React from "react";
 
 export const generateMetadata = ({
@@ -18,18 +18,11 @@ interface DashLayoutProps {
 const DashLayout: React.FC<DashLayoutProps> = ({ children }) => {
   return (
     <ProtectedRoute>
-      <div>
-        <aside className="text-gray-50">
-          <nav>
-            <h1 className="text-5xl">Admin Dashboard</h1>
-            <ul className="m-5 text-xl">
-              <li>
-                <Link href="/">Home</Link>
-              </li>
-            </ul>
-          </nav>
-        </aside>
-        <main style={{ marginLeft: "200px", padding: "20px" }}>{children}</main>
+      <div className="flex">
+        <SideBar />
+        <div className="flex-1 p-4">
+          <main>{children}</main>
+        </div>
       </div>
     </ProtectedRoute>
   );
