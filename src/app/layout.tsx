@@ -1,7 +1,5 @@
-"use client";
-import store from "@/redux/store";
+import ReduxProvider from "@/redux/ReduxProvider";
 import "@/styles/globals.css";
-import { Provider } from "react-redux";
 
 export default function RootLayout({
   children,
@@ -9,10 +7,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Provider store={store}>
+    <ReduxProvider>
       <html lang="en">
         <body>{children}</body>
       </html>
-    </Provider>
+    </ReduxProvider>
   );
 }
