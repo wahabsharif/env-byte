@@ -15,7 +15,7 @@ type Data = {
 };
 
 // JWT Secret - Keep this in your environment variables
-const JWT_SECRET = process.env.JWT_SECRET || "";
+const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET || "";
 
 // Error response function
 const respondError = (
@@ -57,7 +57,7 @@ export default async function handler(
 
       const token = jwt.sign(
         { id: userData.id, username: userData.username, role: userData.role },
-        JWT_SECRET,
+        SUPABASE_JWT_SECRET,
         { expiresIn: "1h" }
       );
 
