@@ -23,7 +23,7 @@ const DashLayout: React.FC<DashLayoutProps> = ({ children }) => {
       <div className="flex h-screen">
         <SideBar />
         <MobileSideBar />
-        <main className="min-h-screen w-full p-2">{children}</main>
+        <main className="min-h-screen w-full py-2">{children}</main>
       </div>
     </ProtectedRoute>
   );

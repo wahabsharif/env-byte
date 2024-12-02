@@ -3,7 +3,7 @@ import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { DotLoader } from "react-spinners";
+import { ClipLoader } from "react-spinners";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -29,7 +29,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <DotLoader size={100} color="#14b8a6" loading={loading} />
+        <ClipLoader size={100} color="#14b8a6" loading={loading} />
       </div>
     );
   }

@@ -33,11 +33,11 @@ const MobileSideBar = () => {
       {/* Toggle Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed top-4 z-50 p-2 bg-thGreen text-white rounded-full shadow-lg transition-all duration-300 ${
-          isOpen ? "left-52" : "left-4"
+        className={`fixed top-1 z-50 p-2 bg-thGreen text-white rounded-full shadow-lg transition-all duration-300 ${
+          isOpen ? "left-44" : "left-1"
         }`}
       >
-        {isOpen ? <FaArrowLeft size={24} /> : <FaArrowRight size={24} />}
+        {isOpen ? <FaArrowLeft size={18} /> : <FaArrowRight size={18} />}
       </motion.button>
 
       {/* Sidebar */}
