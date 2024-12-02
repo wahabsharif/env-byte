@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import NavBar from "@/components/common/NavBar";
+import "@/styles/globals.css";
 
 interface WebLayoutProps {
   children: React.ReactNode;

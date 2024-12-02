@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import SideBar from "@/components/common/SideBar";
 import React from "react";
 import MobileSideBar from "@/components/common/MobileSideBar";
+import "@/styles/dash.css";
 
 export const generateMetadata = ({
   pageTitle,
@@ -19,12 +20,10 @@ interface DashLayoutProps {
 const DashLayout: React.FC<DashLayoutProps> = ({ children }) => {
   return (
     <ProtectedRoute>
-      <div className="flex">
+      <div className="flex h-screen">
         <SideBar />
         <MobileSideBar />
-        <div className="flex-1 p-4">
-          <main>{children}</main>
-        </div>
+        <main className="min-h-screen w-full p-2">{children}</main>
       </div>
     </ProtectedRoute>
   );

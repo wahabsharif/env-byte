@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "MyCustomFont";
+  src: url("/fonts/MADENZ.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-image: url("/images/bg-image.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: #083831 #14b8a6;
+}
+
+/* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #14b8a6;
+}
+
+/* Scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background-color: #083831;
+  border-radius: 10px;
+}
+
+/* Scrollbar thumb hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #14b8a6;
+}

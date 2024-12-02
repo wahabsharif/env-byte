@@ -32,12 +32,13 @@ const SideBar = () => {
   };
 
   return (
-    <motion.div
+    <motion.aside
       initial={{ x: -250 }}
       animate={{ x: 0 }}
       exit={{ x: -250 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="hidden lg:flex fixed top-0 left-0 h-full w-48 bg-gray-800 text-white p-3 shadow-lg flex-col rounded-r-xl"
+      className="shadow-lg flex-col rounded-r-xl min-h-screen p-2 w-48 bg-gray-800 text-white top-0 left-0 hidden lg:flex "
+      // className="fixed w-48 "
     >
       <h1 className="text-xl flex justify-center items-center font-bold tracking-wider text-thLightGreen mb-2 text-center">
         <SiAuthy className="mx-2 " />
@@ -96,7 +97,7 @@ const SideBar = () => {
           <span>Logout</span>
         </motion.button>
       </div>
-    </motion.div>
+    </motion.aside>
   );
 };
 
