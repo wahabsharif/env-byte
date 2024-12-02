@@ -37,7 +37,7 @@ const SideBar = () => {
       animate={{ x: 0 }}
       exit={{ x: -250 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="fixed top-0 left-0 h-full w-48 bg-gray-800 text-white p-3 shadow-lg flex flex-col rounded-r-xl"
+      className="hidden lg:flex fixed top-0 left-0 h-full w-48 bg-gray-800 text-white p-3 shadow-lg flex-col rounded-r-xl"
     >
       <h1 className="text-xl flex justify-center items-center font-bold tracking-wider text-thLightGreen mb-2 text-center">
         <SiAuthy className="mx-2 " />
