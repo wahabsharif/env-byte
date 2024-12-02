@@ -4,22 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import ClientEditModal from "@/components/dashboard/clients/ClientEditModal";
 import AddClient from "@/components/dashboard/clients/AddClient";
-
-type Client = {
-  id: number;
-  title: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  mobile: string;
-  country_id: number;
-};
-
-type Country = {
-  id: number;
-  country_name: string; // Changed to match the API response
-};
+import { Client, Country } from "@/data/types";
 
 const ClientsList = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -144,13 +129,13 @@ const ClientsList = () => {
 
   return (
     <div className="container mx-auto px-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold mb-4 text-center text-thLightGreen">
+      <div className="flex justify-between items-center w-full">
+        <h1 className="text-2xl font-bold mb-4 text-thLightGreen w-full text-center">
           Clients List
         </h1>
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          className="mb-4 bg-green-800 text-white px-2 py-1 rounded-xl text-sm flex-shrink-0"
         >
           Add Client
         </button>

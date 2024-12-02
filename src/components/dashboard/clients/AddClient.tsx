@@ -1,21 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-type Client = {
-  id: number;
-  title: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  mobile: string;
-  country_id: number;
-};
-
-type Country = {
-  id: number;
-  country_name: string;
-};
+import { Client, Country } from "@/data/types";
 
 type ModalProps = {
   isOpen: boolean;
