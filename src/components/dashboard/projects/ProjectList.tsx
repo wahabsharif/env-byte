@@ -24,7 +24,14 @@ const ProjectList: React.FC = () => {
         // Fetching projects first
         const projectResponse = await axios.get("/api/projects");
         const fetchedProjects: Project[] = projectResponse.data;
-        setProjects(fetchedProjects);
+
+        // Sort projects by created_at in descending order
+        const sortedProjects = fetchedProjects.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+        setProjects(sortedProjects);
 
         // Fetching clients and currencies based on the fetched projects
         const clientIds = [
@@ -82,6 +89,15 @@ const ProjectList: React.FC = () => {
     } catch (error) {
       console.error("Error deleting project:", error);
     }
+  };
+
+  const formatAmount = (amount: string | number): string => {
+    const num = typeof amount === "string" ? parseFloat(amount) : amount;
+    return num.toLocaleString("en-US", {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   };
 
   // Memoize payment status to avoid recalculating on every render
@@ -162,17 +178,18 @@ const ProjectList: React.FC = () => {
                     {project.project_type}
                   </td>
                   <td className="py-2 px-4 text-sm text-gray-600">
-                    {project.quoted_amount} {currency?.currency_symbol} (
-                    {currency?.currency_name})
+                    {formatAmount(project.quoted_amount)}{" "}
+                    {currency?.currency_symbol} ({currency?.currency_name})
                   </td>
                   <td className="py-2 px-4 text-sm text-gray-600">
-                    {project.deal_amount} {currency?.currency_symbol} (
-                    {currency?.currency_name})
+                    {formatAmount(project.deal_amount)}{" "}
+                    {currency?.currency_symbol} ({currency?.currency_name})
                   </td>
                   <td className="py-2 px-4 text-sm text-gray-600">
-                    {project.paid_amount} {currency?.currency_symbol} (
-                    {currency?.currency_name})
+                    {formatAmount(project.paid_amount)}{" "}
+                    {currency?.currency_symbol} ({currency?.currency_name})
                   </td>
+
                   <td className="py-2 px-4 text-sm text-gray-600">
                     {project.description}
                   </td>
