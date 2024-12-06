@@ -10,6 +10,7 @@ export interface Project {
   paid_amount: string;
   project_note: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Client {

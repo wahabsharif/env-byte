@@ -25,10 +25,10 @@ const ProjectList: React.FC = () => {
         const projectResponse = await axios.get("/api/projects");
         const fetchedProjects: Project[] = projectResponse.data;
 
-        // Sort projects by created_at in descending order
+        // Sort projects by updated_at in descending order
         const sortedProjects = fetchedProjects.sort(
           (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
         );
 
         setProjects(sortedProjects);

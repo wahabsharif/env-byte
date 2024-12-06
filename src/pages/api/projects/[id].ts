@@ -49,6 +49,7 @@ export default async function handler(
         paid_amount,
         description,
         project_note,
+        updated_at: new Date().toISOString(), // Manually set updated_at
       })
       .eq("id", id);
     if (error) return res.status(500).json({ error: error.message });
