@@ -6,8 +6,8 @@ export interface Project {
   quoted_amount: number;
   description: string;
   project_type: string;
-  deal_amount: string;
-  paid_amount: string;
+  deal_amount: number;
+  paid_amount?: string | number[];
   project_note: string;
   created_at: string;
   updated_at: string;

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Client, Currency, Project } from "@/data/types";
+import { FaTimes, FaPlus } from "react-icons/fa";
 
 interface EditProjectModalProps {
   isOpen: boolean;
@@ -24,8 +25,8 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   const [dealAmount, setDealAmount] = useState(
     currentProject.deal_amount || ""
   );
-  const [paidAmount, setPaidAmount] = useState(
-    currentProject.paid_amount || ""
+  const [paidAmount, setPaidAmount] = useState<number[]>(
+    Array.isArray(currentProject.paid_amount) ? currentProject.paid_amount : []
   );
   const [description, setDescription] = useState(currentProject.description);
   const [projectNote, setProjectNote] = useState(
@@ -52,6 +53,45 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     }
   }, [isOpen]);
 
+  // Update paidAmount if currentProject changes
+  useEffect(() => {
+    if (Array.isArray(currentProject.paid_amount)) {
+      setPaidAmount(currentProject.paid_amount);
+    } else if (typeof currentProject.paid_amount === "string") {
+      const paidAmounts = currentProject.paid_amount
+        .split(",")
+        .map((amt) => Number(amt.trim()))
+        .filter((amt) => !isNaN(amt));
+      setPaidAmount(paidAmounts);
+    } else {
+      setPaidAmount([]);
+    }
+  }, [currentProject]);
+
+  const handleAddPayment = () => {
+    setPaidAmount([...paidAmount, 0]);
+  };
+
+  const handleRemovePayment = (index: number) => {
+    const updatedPaidAmount = paidAmount.filter((_, i) => i !== index);
+    setPaidAmount(updatedPaidAmount);
+  };
+
+  const handlePaymentChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const value = e.target.value.trim() === "" ? 0 : Number(e.target.value);
+
+    if (!isNaN(value)) {
+      const updatedPaidAmount = [...paidAmount];
+      updatedPaidAmount[index] = value;
+      setPaidAmount(updatedPaidAmount);
+    } else {
+      console.error("Invalid value entered:", e.target.value);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -66,6 +106,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
         description,
         project_note: projectNote,
       });
+
       setIsOpen(false);
     } catch (error) {
       console.error("Error editing project:", error);
@@ -78,13 +119,14 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
         <div className="bg-gray-900/80 backdrop-blur-lg inset-0 p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto">
           <h2 className="text-xl mb-4 font-bold text-gray-200">Edit Project</h2>
           <form onSubmit={handleSubmit} className="h-full">
+            {/* Client Selection */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
                 Client
               </label>
               <select
                 value={clientId}
-                onChange={(e) => setClientId(e.target.value)}
+                onChange={(e) => setClientId(Number(e.target.value))}
                 className="w-full p-2 border rounded-full"
                 required
               >
@@ -97,6 +139,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               </select>
             </div>
 
+            {/* Project Name */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
                 Project Name
@@ -110,6 +153,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               />
             </div>
 
+            {/* Project Type */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
                 Project Type
@@ -123,13 +167,14 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               />
             </div>
 
+            {/* Currency Selection */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
                 Currency
               </label>
               <select
                 value={currencyId}
-                onChange={(e) => setCurrencyId(e.target.value)}
+                onChange={(e) => setCurrencyId(Number(e.target.value))}
                 className="w-full p-2 border rounded-full"
                 required
               >
@@ -142,6 +187,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               </select>
             </div>
 
+            {/* Quoted Amount */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
                 Quoted Amount
@@ -155,6 +201,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               />
             </div>
 
+            {/* Deal Amount */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
                 Deal Amount
@@ -162,23 +209,50 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               <input
                 type="number"
                 value={dealAmount}
-                onChange={(e) => setDealAmount(String(e.target.value))}
+                onChange={(e) => setDealAmount(e.target.value)}
                 className="w-full p-2 border rounded-full"
               />
             </div>
 
+            {/* Paid Amounts Section */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
-                Paid Amount
+                Paid Amounts
               </label>
-              <input
-                type="number"
-                value={paidAmount}
-                onChange={(e) => setPaidAmount(String(e.target.value))}
-                className="w-full p-2 border rounded-full"
-              />
+              {paidAmount.length === 0 && (
+                <div className="text-red-800 tracking-widest text-md">
+                  No payment Received.
+                </div>
+              )}
+              {paidAmount.map((amount, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => handlePaymentChange(e, index)}
+                    className="w-full p-2 my-1 border rounded-full"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePayment(index)}
+                    className="text-white bg-red-900 p-2 rounded-full"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={handleAddPayment}
+                className="bg-thGreen text-white px-2 py-1 rounded-full mt-2 flex justify-center items-center"
+              >
+                <FaPlus className="mr-2 text-sm" />
+                Add Payment
+              </button>
             </div>
 
+            {/* Description */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
                 Description
@@ -191,6 +265,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               />
             </div>
 
+            {/* Project Note */}
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-200">
                 Project Note
@@ -203,19 +278,20 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               />
             </div>
 
-            <div className="flex justify-end mt-4">
+            {/* Buttons */}
+            <div className="flex justify-between items-center">
               <button
                 type="button"
-                className="bg-gray-400 text-white px-4 py-2 rounded-full mr-2"
                 onClick={() => setIsOpen(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded-full"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-green-800 text-white px-4 py-2 rounded-full"
+                className="bg-green-500 text-white px-4 py-2 rounded-full"
               >
-                Save
+                Save Changes
               </button>
             </div>
           </form>

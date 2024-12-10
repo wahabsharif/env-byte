@@ -102,11 +102,22 @@ const ProjectList: React.FC = () => {
 
   // Memoize payment status to avoid recalculating on every render
   const getPaymentStatus = useMemo(
-    () => (dealAmount: string, paidAmount: string) => {
-      const deal = parseFloat(dealAmount);
-      const paid = parseFloat(paidAmount);
-      return deal > paid ? "Pending" : "Paid";
-    },
+    () =>
+      (
+        dealAmount: string | number,
+        paidAmount: string | number[] | undefined
+      ) => {
+        const deal = parseFloat(dealAmount.toString());
+        const paid = Array.isArray(paidAmount)
+          ? paidAmount.reduce(
+              (acc, amount) => acc + parseFloat(amount.toString()),
+              0
+            )
+          : paidAmount !== undefined
+          ? parseFloat(paidAmount.toString())
+          : 0;
+        return deal > paid ? "Pending" : "Paid";
+      },
     []
   );
 
@@ -140,6 +151,7 @@ const ProjectList: React.FC = () => {
               <th className="py-2 px-4 text-sm text-gray-600">Project Name</th>
               <th className="py-2 px-4 text-sm text-gray-600">Client Name</th>
               <th className="py-2 px-4 text-sm text-gray-600">Project Type</th>
+              <th className="py-2 px-4 text-sm text-gray-600">Currency</th>
               <th className="py-2 px-4 text-sm text-gray-600">Quoted Amount</th>
               <th className="py-2 px-4 text-sm text-gray-600">Deal Amount</th>
               <th className="py-2 px-4 text-sm text-gray-600">Paid Amount</th>
@@ -178,16 +190,22 @@ const ProjectList: React.FC = () => {
                     {project.project_type}
                   </td>
                   <td className="py-2 px-4 text-sm text-gray-600">
-                    {formatAmount(project.quoted_amount)}{" "}
                     {currency?.currency_symbol} ({currency?.currency_name})
+                  </td>
+                  <td className="py-2 px-4 text-sm text-gray-600">
+                    {formatAmount(project.quoted_amount)}{" "}
                   </td>
                   <td className="py-2 px-4 text-sm text-gray-600">
                     {formatAmount(project.deal_amount)}{" "}
-                    {currency?.currency_symbol} ({currency?.currency_name})
                   </td>
                   <td className="py-2 px-4 text-sm text-gray-600">
-                    {formatAmount(project.paid_amount)}{" "}
-                    {currency?.currency_symbol} ({currency?.currency_name})
+                    {Array.isArray(project.paid_amount)
+                      ? project.paid_amount.map((amount, index) => (
+                          <div key={index}>{formatAmount(amount)}</div>
+                        ))
+                      : project.paid_amount !== undefined
+                      ? formatAmount(project.paid_amount)
+                      : "No payment data"}
                   </td>
 
                   <td className="py-2 px-4 text-sm text-gray-600">
