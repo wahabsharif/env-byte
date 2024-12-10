@@ -14,18 +14,16 @@ const ProjectList: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Track loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProjectsClientsAndCurrencies = async () => {
       try {
         setIsLoading(true);
 
-        // Fetching projects first
         const projectResponse = await axios.get("/api/projects");
         const fetchedProjects: Project[] = projectResponse.data;
 
-        // Sort projects by updated_at in descending order
         const sortedProjects = fetchedProjects.sort(
           (a, b) =>
             new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
@@ -33,7 +31,6 @@ const ProjectList: React.FC = () => {
 
         setProjects(sortedProjects);
 
-        // Fetching clients and currencies based on the fetched projects
         const clientIds = [
           ...new Set(fetchedProjects.map((project) => project.client_id)),
         ];
@@ -41,7 +38,6 @@ const ProjectList: React.FC = () => {
           ...new Set(fetchedProjects.map((project) => project.currency_id)),
         ];
 
-        // Fetch clients and currencies in parallel
         const [clientResponse, currencyResponse] = await Promise.all([
           axios.get(`/api/clients?ids=${clientIds.join(",")}`),
           axios.get(`/api/currencies?ids=${currencyIds.join(",")}`),
@@ -100,7 +96,6 @@ const ProjectList: React.FC = () => {
     });
   };
 
-  // Memoize payment status to avoid recalculating on every render
   const getPaymentStatus = useMemo(
     () =>
       (
@@ -129,6 +124,25 @@ const ProjectList: React.FC = () => {
     );
   }
 
+  // Calculate the totals for Quoted Amount, Deal Amount, Paid Amount, and Pending Amount
+  const totals = projects.reduce(
+    (acc, project) => {
+      acc.quotedAmount += parseFloat(project.quoted_amount.toString()) || 0;
+      acc.dealAmount += parseFloat(project.deal_amount.toString()) || 0;
+      if (Array.isArray(project.paid_amount)) {
+        acc.paidAmount += project.paid_amount.reduce(
+          (sum, amount) => sum + parseFloat(amount.toString()),
+          0
+        );
+      } else if (project.paid_amount !== undefined) {
+        acc.paidAmount += parseFloat(project.paid_amount.toString());
+      }
+      acc.pendingAmount = acc.dealAmount - acc.paidAmount;
+      return acc;
+    },
+    { quotedAmount: 0, dealAmount: 0, paidAmount: 0, pendingAmount: 0 }
+  );
+
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-between items-center w-full">
@@ -143,7 +157,6 @@ const ProjectList: React.FC = () => {
         </button>
       </div>
 
-      {/* Make table horizontally scrollable */}
       <div className="overflow-x-auto w-full">
         <table className="min-w-full table-auto bg-white rounded-xl">
           <thead>
@@ -243,6 +256,26 @@ const ProjectList: React.FC = () => {
                 </tr>
               );
             })}
+
+            {/* Summary Row */}
+            <tr className="text-gray-600 font-bold  text-center">
+              <td className="py-2 px-4 text-lg font-extrabold tracking-widest">
+                Total
+              </td>
+              <td colSpan={3}></td>
+              <td className="py-1 px-2">{formatAmount(totals.quotedAmount)}</td>
+              <td className="py-1 px-2  bg-thGreen text-white rounded-xl">
+                {formatAmount(totals.dealAmount)}
+              </td>
+              <td className="py-1 px-2  bg-green-800 text-white rounded-xl">
+                {formatAmount(totals.paidAmount)}
+              </td>
+              <td className="py-1 px-2 bg-red-800 text-white rounded-xl">
+                {formatAmount(totals.pendingAmount)}
+              </td>
+              <td colSpan={4}></td>
+              <td></td>
+            </tr>
           </tbody>
         </table>
       </div>
