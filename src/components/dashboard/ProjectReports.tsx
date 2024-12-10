@@ -67,7 +67,6 @@ const ProjectReports: React.FC = () => {
     labels: ["Quoted Amount", "Deal Amount", "Paid Amount", "Pending Amount"],
     datasets: [
       {
-        label: "Project Summary",
         data: [
           totalQuotedAmount,
           totalDealAmount,
